@@ -1,6 +1,18 @@
 use libfacedetection_sys::facedetect_cnn as facedetect_cnn_sys;
 use std::os::raw::c_int;
 use std::alloc::{self, Layout};
+use thiserror::Error;
+
+// DO NOT CHANGE!
+const BUF_SIZE: usize = 0x20000;
+
+#[derive(Error, Debug)]
+pub enum LibFacedetectionError {
+    #[error("allocation error")]
+    AllocError(#[from] alloc::LayoutError),
+    #[error("error from the facedetection lib")]
+    FaceDetectionError,
+}
 
 #[derive(Debug)]
 pub struct Face {
@@ -42,11 +54,11 @@ pub struct DetectionResult {
 
 pub fn facedetect_cnn(
     bgr_image_data: *const u8,
-    width: usize,
-    height: usize,
-    step: usize,
-) -> Result<DetectionResult, ()> {
-    let layout = Layout::new::<::std::os::raw::c_uchar>();
+    width: i32,
+    height: i32,
+    step: u32,
+) -> Result<DetectionResult, LibFacedetectionError> {
+    let layout = Layout::from_size_align(BUF_SIZE, 32)?;
     let result_buffer = unsafe { alloc::alloc(layout) };
 
     let result = unsafe {
@@ -59,16 +71,17 @@ pub fn facedetect_cnn(
         ) as *const i32
     };
     if result.is_null() {
-        return Err(());
+        return Err(LibFacedetectionError::FaceDetectionError);
     }
     let faces_detected = unsafe { *result };
 
     let mut faces = Vec::with_capacity(faces_detected as usize);
     for idx in 0..faces_detected {
-        let p = unsafe { (result_buffer.offset(1) as *const u16).offset(142*idx as isize) };
+        let p = unsafe { (result.offset(1) as *const u16).offset(142*idx as isize) };
         let face = unsafe { Face::from_ptr(p) };
         faces.push(face);
     }
+    unsafe { alloc::dealloc(result_buffer, layout); }
     let detection_result = DetectionResult { faces: faces };
     Ok(detection_result)
 }

@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 libfacedetection-sys = { version = "0.1.0", path = "../libfacedetection-sys" }
+thiserror = "1.0.32"
