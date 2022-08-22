@@ -28,7 +28,7 @@ pub struct Face {
     /// height
     pub h: u16,
     /// landmarks (nose, eyes, mouth, etc..)
-    pub landmarks: [u16; 10],
+    pub landmarks: [(u16, u16); 5],
 }
 
 impl Face {
@@ -38,9 +38,11 @@ impl Face {
         let y = *data.offset(2);
         let w = *data.offset(3);
         let h = *data.offset(4);
-        let mut landmarks = [0; 10];
-        for idx in 0..10 {
-            let landmark = *data.offset(5 + idx);
+        let mut landmarks = [(0,0); 5];
+        for idx in 0..5 {
+            let landmark_x = *data.offset(5 + idx*2);
+            let landmark_y = *data.offset(5 + idx*2+1);
+            let landmark = (landmark_x, landmark_y);
             landmarks[idx as usize] = landmark;
         }
         Face {
