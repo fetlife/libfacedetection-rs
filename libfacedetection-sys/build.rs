@@ -1,10 +1,7 @@
-use bindgen;
-use cmake;
-
 use std::env;
 use std::path::PathBuf;
 
-#[cfg(target_arch="x86_64")]
+#[cfg(target_arch = "x86_64")]
 fn compile_libfacedetection() -> PathBuf {
     cmake::Config::new("libfacedetection")
         .define("ENABLE_NEON", "OFF")
@@ -15,7 +12,7 @@ fn compile_libfacedetection() -> PathBuf {
         .build()
 }
 
-#[cfg(target_arch="aarch64")]
+#[cfg(target_arch = "aarch64")]
 fn compile_libfacedetection() -> PathBuf {
     cmake::Config::new("libfacedetection")
         .define("ENABLE_NEON", "ON")
@@ -26,11 +23,13 @@ fn compile_libfacedetection() -> PathBuf {
         .build()
 }
 
-
 fn main() {
     let facedetection_lib = compile_libfacedetection();
     // Tell cargo to look for shared libraries in the specified directory
-    println!("cargo:rustc-link-search={}/lib", facedetection_lib.display());
+    println!(
+        "cargo:rustc-link-search={}/lib",
+        facedetection_lib.display()
+    );
     println!("cargo:rustc-link-lib=facedetection");
 
     // Tell cargo to tell rustc to link the system bzip2
@@ -47,7 +46,10 @@ fn main() {
         // The input header we would like to generate
         // bindings for.
         .header("wrapper.hpp")
-        .clang_arg(format!("-I{}/include/facedetection", facedetection_lib.display()))
+        .clang_arg(format!(
+            "-I{}/include/facedetection",
+            facedetection_lib.display()
+        ))
         .allowlist_function("facedetect_cnn")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
