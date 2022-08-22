@@ -30,11 +30,9 @@ fn main() {
         "cargo:rustc-link-search={}/lib",
         facedetection_lib.display()
     );
-    println!("cargo:rustc-link-lib=facedetection");
 
-    // Tell cargo to tell rustc to link the system bzip2
-    // shared library.
-    // println!("cargo:rustc-link-lib=bz2");
+    // Tell cargo to tell rustc to link our compiled libfacedetection library
+    println!("cargo:rustc-link-lib=facedetection");
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=wrapper.hpp");
@@ -46,10 +44,12 @@ fn main() {
         // The input header we would like to generate
         // bindings for.
         .header("wrapper.hpp")
+        // give path to headers
         .clang_arg(format!(
             "-I{}/include/facedetection",
             facedetection_lib.display()
         ))
+        // only export one function
         .allowlist_function("facedetect_cnn")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
