@@ -1,0 +1,3 @@
+[submodule "libfacedetection-sys/libfacedetection"]
+	path = libfacedetection-sys/libfacedetection
+	url = https://github.com/ShiqiYu/libfacedetection.git
