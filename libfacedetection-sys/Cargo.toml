@@ -3,9 +3,15 @@ name = "libfacedetection-sys"
 version = "0.1.0"
 edition = "2021"
 links = "facedetection"
+authors = ["Andrii Dmytrenko <andrii@fetlife.com>"]
+categories = ["external-ffi-bindings"]
+repository = "https://github.com/fetlife/libfacedetection-rs"
+license = "MIT"
+include = ["/src", "/wrapper.hpp", "/build.rs", "/libfacedetection/src", "/libfacedetection/CMakeLists.txt", "/libfacedetection/LICENSE"]
+description = "libfacedetection external ffi bindings"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-bindgen = "0.60.1"
+bindgen = "0.60.1, < 1.0.0"
 cmake = "0.1.48"
