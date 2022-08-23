@@ -3,6 +3,12 @@ name = "libfacedetection"
 version = "0.1.0"
 edition = "2021"
 authors = ["Andrii Dmytrenko <andrii@fetlife.com>"]
+descriotion = "Rust bindings to libfacedetection"
+readme = "Readme.md"
+repository = "https://github.com/fetlife/libfacedetection-rs"
+license = "MIT"
+keywords = ["libfacedetection", "bindings", "face detection", "cnn"]
+categories = ["api-bindings", "science"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
