@@ -3,7 +3,7 @@ name = "libfacedetection"
 version = "0.1.0"
 edition = "2021"
 authors = ["Andrii Dmytrenko <andrii@fetlife.com>"]
-descriotion = "Rust bindings to libfacedetection"
+description = "Rust bindings to libfacedetection"
 readme = "Readme.md"
 repository = "https://github.com/fetlife/libfacedetection-rs"
 license = "MIT"
@@ -15,3 +15,6 @@ categories = ["api-bindings", "science"]
 [dependencies]
 libfacedetection-sys = { version = "0.1.0", path = "../libfacedetection-sys" }
 thiserror = "1.0.32"
+
+[dev-dependencies]
+opencv = "0.66.0"
