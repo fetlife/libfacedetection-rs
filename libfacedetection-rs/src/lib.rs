@@ -7,7 +7,7 @@ use thiserror::Error;
 const BUF_SIZE: usize = 0x20000;
 
 #[derive(Error, Debug)]
-pub enum LibFacedetectionError {
+pub enum LibfacedetectionError {
     #[error("allocation error")]
     AllocError(#[from] alloc::LayoutError),
     #[error("error from the facedetection lib")]
@@ -24,9 +24,9 @@ pub struct Face {
     /// y coordinate
     pub y: u16,
     /// width
-    pub w: u16,
+    pub width: u16,
     /// height
-    pub h: u16,
+    pub height: u16,
     /// landmarks (nose, eyes, mouth, etc..)
     pub landmarks: [(u16, u16); 5],
 }
@@ -36,8 +36,8 @@ impl Face {
         let confidence = *data.offset(0);
         let x = *data.offset(1);
         let y = *data.offset(2);
-        let w = *data.offset(3);
-        let h = *data.offset(4);
+        let width = *data.offset(3);
+        let height = *data.offset(4);
         let mut landmarks = [(0,0); 5];
         for idx in 0..5 {
             let landmark_x = *data.offset(5 + idx*2);
@@ -49,8 +49,8 @@ impl Face {
             confidence,
             x,
             y,
-            w,
-            h,
+            width,
+            height,
             landmarks,
         }
     }
@@ -67,7 +67,7 @@ pub fn facedetect_cnn(
     width: i32,
     height: i32,
     step: u32,
-) -> Result<DetectionResult, LibFacedetectionError> {
+) -> Result<DetectionResult, LibfacedetectionError> {
     let layout = Layout::from_size_align(BUF_SIZE, 32)?;
     let result_buffer = unsafe { alloc::alloc(layout) };
 
@@ -81,7 +81,7 @@ pub fn facedetect_cnn(
         ) as *const i32
     };
     if result.is_null() {
-        return Err(LibFacedetectionError::FaceDetectionError);
+        return Err(LibfacedetectionError::FaceDetectionError);
     }
     let faces_detected = unsafe { *result };
 
