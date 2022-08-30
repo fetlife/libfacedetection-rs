@@ -1,46 +1,38 @@
 use std::env;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 #[cfg(target_arch = "x86_64")]
-fn compile_libfacedetection() -> PathBuf {
-    cmake::Config::new("libfacedetection")
-        .define("ENABLE_NEON", "OFF")
-        .define("ENABLE_AVX2", "ON")
-        .define("DEMO", "OFF")
-        .define("BUILD_SHARED_LIBS", "OFF")
-        .define("CMAKE_BUILD_TYPE", "Release")
-        .build()
+fn configure_builder(builder: &mut cc::Build) -> &mut cc::Build {
+    builder
+        .define("_ENABLE_AVX2", "ON")
+        .flag("-mavx2")
+        .flag("-mfma")
 }
 
 #[cfg(target_arch = "aarch64")]
-fn compile_libfacedetection() -> PathBuf {
-    cmake::Config::new("libfacedetection")
-        .define("ENABLE_NEON", "ON")
-        .define("ENABLE_AVX2", "OFF")
-        .define("DEMO", "OFF")
-        .define("BUILD_SHARED_LIBS", "OFF")
-        .define("CMAKE_BUILD_TYPE", "Release")
+fn configure_builder(builder: &mut cc::Build) -> &mut cc::Build {
+    builder
+        .define("_ENABLE_NEON", "ON")
         .build()
 }
 
 fn main() {
-    let facedetection_lib = compile_libfacedetection();
-    // Tell cargo to look for shared libraries in the specified directory
-    println!(
-        "cargo:rustc-link-search={}/lib",
-        facedetection_lib.display()
-    );
-
-    // Tell cargo to tell rustc to link our compiled libfacedetection library
-    println!("cargo:rustc-link-lib=static=facedetection");
-    #[cfg(target_os = "macos")]
-    println!("cargo:rustc-link-lib=dylib=c++");
-    #[cfg(all(target_family = "unix", not(target_os = "macos")))]
-    println!("cargo:rustc-link-lib=dylib=stdc++");
-
-
-    // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=wrapper.hpp");
+
+    let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let dir = Path::new(&crate_dir);
+    let libfacedetection_dir = dir.join("libfacedetection/src");
+
+    let mut builder = cc::Build::new();
+    builder
+        .cpp(true)
+        .include(dir.join("libfacedetection/src"))
+        .include(&dir)
+        .file(libfacedetection_dir.join("facedetectcnn-data.cpp"))
+        .file(libfacedetection_dir.join("facedetectcnn-model.cpp"))
+        .file(libfacedetection_dir.join("facedetectcnn.cpp"));
+    let builder = configure_builder(&mut builder);
+    builder.compile("facedetection");
 
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
@@ -51,8 +43,12 @@ fn main() {
         .header("wrapper.hpp")
         // give path to headers
         .clang_arg(format!(
-            "-I{}/include/facedetection",
-            facedetection_lib.display()
+            "-I{}",
+            libfacedetection_dir.display(),
+        ))
+        .clang_arg(format!(
+            "-I{}",
+            dir.display(),
         ))
         // only export one function
         .allowlist_function("facedetect_cnn")
