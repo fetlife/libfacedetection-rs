@@ -33,7 +33,10 @@ fn main() {
 
     // Tell cargo to tell rustc to link our compiled libfacedetection library
     println!("cargo:rustc-link-lib=static=facedetection");
+    #[cfg(target_os = "macos")]
     println!("cargo:rustc-link-lib=dylib=c++");
+    #[cfg(all(target_family = "unix", not(target_os = "macos")))]
+    println!("cargo:rustc-link-lib=dylib=stdc++");
 
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
