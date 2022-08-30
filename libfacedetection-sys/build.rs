@@ -7,7 +7,7 @@ fn compile_libfacedetection() -> PathBuf {
         .define("ENABLE_NEON", "OFF")
         .define("ENABLE_AVX2", "ON")
         .define("DEMO", "OFF")
-        .define("BUILD_SHARED_LIBS", "ON")
+        .define("BUILD_SHARED_LIBS", "OFF")
         .define("CMAKE_BUILD_TYPE", "Release")
         .build()
 }
@@ -18,7 +18,7 @@ fn compile_libfacedetection() -> PathBuf {
         .define("ENABLE_NEON", "ON")
         .define("ENABLE_AVX2", "OFF")
         .define("DEMO", "OFF")
-        .define("BUILD_SHARED_LIBS", "ON")
+        .define("BUILD_SHARED_LIBS", "OFF")
         .define("CMAKE_BUILD_TYPE", "Release")
         .build()
 }
@@ -32,7 +32,7 @@ fn main() {
     );
 
     // Tell cargo to tell rustc to link our compiled libfacedetection library
-    println!("cargo:rustc-link-lib=facedetection");
+    println!("cargo:rustc-link-lib=static=facedetection");
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=wrapper.hpp");
