@@ -33,6 +33,8 @@ fn main() {
 
     // Tell cargo to tell rustc to link our compiled libfacedetection library
     println!("cargo:rustc-link-lib=static=facedetection");
+    println!("cargo:rustc-link-lib=dylib=c++");
+
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=wrapper.hpp");
