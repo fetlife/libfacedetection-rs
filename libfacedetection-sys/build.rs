@@ -3,10 +3,16 @@ use std::path::{PathBuf, Path};
 
 #[cfg(target_arch = "x86_64")]
 fn configure_builder(builder: &mut cc::Build) -> &mut cc::Build {
-    builder
+    #[cfg(target_feature = "avx2")]
+    let builder = builder
         .define("_ENABLE_AVX2", "ON")
         .flag("-mavx2")
-        .flag("-mfma")
+        .flag("-mfma");
+    #[cfg(target_feature = "avx512")]
+    let builder = builder
+        .define("_ENABLE_AVX512", "ON")
+        .flag("-mavx512bw");
+    builder
 }
 
 #[cfg(target_arch = "aarch64")]
