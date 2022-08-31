@@ -13,7 +13,6 @@ fn configure_builder(builder: &mut cc::Build) -> &mut cc::Build {
 fn configure_builder(builder: &mut cc::Build) -> &mut cc::Build {
     builder
         .define("_ENABLE_NEON", "ON")
-        .build()
 }
 
 fn main() {
