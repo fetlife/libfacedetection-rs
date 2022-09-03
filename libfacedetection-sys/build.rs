@@ -21,25 +21,9 @@ fn configure_builder(builder: &mut cc::Build) -> &mut cc::Build {
         .define("_ENABLE_NEON", "ON")
 }
 
-fn main() {
-    println!("cargo:rerun-if-changed=wrapper.hpp");
-
-    let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    let dir = Path::new(&crate_dir);
-    let libfacedetection_dir = dir.join("libfacedetection/src");
-
-    let mut builder = cc::Build::new();
-    builder
-        .cpp(true)
-        .include(dir.join("libfacedetection/src"))
-        .include(&dir)
-        .file(libfacedetection_dir.join("facedetectcnn-data.cpp"))
-        .file(libfacedetection_dir.join("facedetectcnn-model.cpp"))
-        .file(libfacedetection_dir.join("facedetectcnn.cpp"));
-    let builder = configure_builder(&mut builder);
-    builder.compile("facedetection");
-
-    // The bindgen::Builder is the main entry point
+#[cfg(feature = "bindngen")]
+fn generate_bindings() {
+  // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
     // the resulting bindings.
     let bindings = bindgen::Builder::default()
@@ -70,4 +54,26 @@ fn main() {
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
+}
+
+fn main() {
+    println!("cargo:rerun-if-changed=wrapper.hpp");
+
+    let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let dir = Path::new(&crate_dir);
+    let libfacedetection_dir = dir.join("libfacedetection/src");
+
+    let mut builder = cc::Build::new();
+    builder
+        .cpp(true)
+        .include(dir.join("libfacedetection/src"))
+        .include(&dir)
+        .file(libfacedetection_dir.join("facedetectcnn-data.cpp"))
+        .file(libfacedetection_dir.join("facedetectcnn-model.cpp"))
+        .file(libfacedetection_dir.join("facedetectcnn.cpp"));
+    let builder = configure_builder(&mut builder);
+    builder.compile("facedetection");
+
+    #[cfg(feature = "bindngen")]
+    generate_bindings();
 }
