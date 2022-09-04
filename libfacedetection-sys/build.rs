@@ -1,5 +1,5 @@
 use std::env;
-use std::path::{PathBuf, Path};
+use std::path::Path;
 
 #[cfg(target_arch = "x86_64")]
 fn configure_builder(builder: &mut cc::Build) -> &mut cc::Build {
@@ -9,21 +9,20 @@ fn configure_builder(builder: &mut cc::Build) -> &mut cc::Build {
         .flag("-mavx2")
         .flag("-mfma");
     #[cfg(target_feature = "avx512")]
-    let builder = builder
-        .define("_ENABLE_AVX512", "ON")
-        .flag("-mavx512bw");
+    let builder = builder.define("_ENABLE_AVX512", "ON").flag("-mavx512bw");
     builder
 }
 
 #[cfg(target_arch = "aarch64")]
 fn configure_builder(builder: &mut cc::Build) -> &mut cc::Build {
-    builder
-        .define("_ENABLE_NEON", "ON")
+    builder.define("_ENABLE_NEON", "ON")
 }
 
 #[cfg(feature = "bindngen")]
 fn generate_bindings() {
-  // The bindgen::Builder is the main entry point
+    use std::path::PathBuf;
+
+    // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
     // the resulting bindings.
     let bindings = bindgen::Builder::default()
@@ -31,14 +30,8 @@ fn generate_bindings() {
         // bindings for.
         .header("wrapper.hpp")
         // give path to headers
-        .clang_arg(format!(
-            "-I{}",
-            libfacedetection_dir.display(),
-        ))
-        .clang_arg(format!(
-            "-I{}",
-            dir.display(),
-        ))
+        .clang_arg(format!("-I{}", libfacedetection_dir.display(),))
+        .clang_arg(format!("-I{}", dir.display(),))
         // only export one function
         .allowlist_function("facedetect_cnn")
         // Tell cargo to invalidate the built crate whenever any of the
