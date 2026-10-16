@@ -112,7 +112,7 @@ mod tests {
             img.ptr(0).unwrap(),
             img.cols(),
             img.rows(),
-            img.mat_step().get(0) as u32,
+            *img.mat_step().get(0).unwrap() as u32,
         )
         .expect("failed to detect faces");
         assert_eq!(faces.faces.len(), 1);
