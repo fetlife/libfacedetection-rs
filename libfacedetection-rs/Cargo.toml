@@ -17,4 +17,4 @@ libfacedetection-sys = { version = "0.2.0", path = "../libfacedetection-sys" }
 thiserror = "1.0.32"
 
 [dev-dependencies]
-opencv = { version = "0.101", default-features = false, features = ["imgcodecs"] }
+opencv = { version = "0.101", default-features = false, features = ["clang-runtime", "imgcodecs"] }
